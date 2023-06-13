@@ -142,6 +142,8 @@ public class BoletaController {
 		}
 		return "redirect:/boleta/lista";
 	}
+	
+	
 	@RequestMapping("/reporteCliente")
 	public void reporteCliente(HttpServletResponse response) {
 		try {
@@ -166,6 +168,32 @@ public class BoletaController {
 		}
 		
 	}
+	
+	@RequestMapping("/reporteMedicamento")
+	public void reporteMedicamento(HttpServletResponse response) {
+		try {
+			//invocar al método listarTodos
+			List<Medicamento> lista=serMedicamento.listarTodos();
+			//acceder al reporte "reporteCliente.jrxml"
+			File file=ResourceUtils.getFile("classpath:prueba.jrxml");
+			//crear objeto de la clase JasperReport y manipular el objeto file
+			JasperReport jasper=JasperCompileManager.compileReport(file.getAbsolutePath());
+			//origen de datos "manipular lista"
+			JRBeanCollectionDataSource origen=new JRBeanCollectionDataSource(lista);
+			//crear reporte
+			JasperPrint jasperPrint=JasperFillManager.fillReport(jasper,null,origen);
+			//salida del reporte en formato PDF
+			response.setContentType("application/pdf");
+			//
+			OutputStream salida=response.getOutputStream();
+			//exportar a pdf
+			JasperExportManager.exportReportToPdfStream(jasperPrint,salida);		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	
 }
 
